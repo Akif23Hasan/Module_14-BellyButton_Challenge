@@ -22,6 +22,10 @@ To complete the Belly Button Challenge, follow these steps:
 
 4) Display the sample metadata, which includes an individual's demographic information. 
 5) Ensure that all the plots update dynamically when a new sample is selected from the dropdown menu. Feel free to create a custom layout for your dashboard.
+6) Adapt the Gauge Chart from [Plotly Gauge Charts](https://plot.ly/javascript/gauge-charts/) to plot the weekly washing frequency of the individual.
+   - You will need to modify the example gauge code to account for values ranging from 0 through 9.
+   - Update the chart whenever a new sample is selected.
+
 
 ## References
 Hulcr, J. et al. (2012) A Jungle in There: Bacteria in Belly Buttons are Highly Diverse, but Predictable. Retrieved from: http://robdunnlab.com/projects/belly-button-biodiversity/results-and-data/Links to an external site.

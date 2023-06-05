@@ -6,7 +6,7 @@ d3.json(url).then(function(data) {
   console.log(data);
 });
 
-// Starting the dashboard at opening the index up 
+// Starting the dashboard at opening the index up
 function init() {
   // Use D3 to select the dropdown menu
   let dropdownMenu = d3.select("#selDataset");
@@ -15,65 +15,36 @@ function init() {
   d3.json(url).then((data) => {
     // Set a variable for the sample names
     let names = data.names;
-    // Add samples to dropdown menu
+
+    // Add samples to dropdown menu and log the value of id for each iteration of the loop
     names.forEach((id) => {
-      // Log the value of id for each iteration of the loop
       console.log(id);
-      dropdownMenu.append("option").text(id).property("value",id);
+      dropdownMenu.append("option").text(id).property("value", id);
     });
 
-    // Set the first sample from the list
+    // Set the first sample from the list and log the value of startingsubjectid
     let startingsubjectid = names[0];
-
-    // Log the value of startingsubjectid
     console.log(startingsubjectid);
 
     // Build the initial plots
-    buildMetadata(startingsubjectid);
-    buildBarChart(startingsubjectid);
-    buildBubbleChart(startingsubjectid);
-    buildGaugeChart(startingsubjectid);
+    Metadata(startingsubjectid);
+    BarChart(startingsubjectid);
+    BubbleChart(startingsubjectid);
+    GaugeChart(startingsubjectid);
   });
 }
 
-// Function that populates metadata info
-function buildMetadata(sample) {
-  // Use D3 to retrieve all of the data
-  d3.json(url).then((data) => {
-    // Retrieve all metadata
-    let metadata = data.metadata;
-    // Filter based on the value of the sample
-    let value = metadata.filter(result => result.id == sample);
-    // Log the array of metadata objects after they have been filtered
-    console.log(value);
-    // Get the first index from the array
-    let valueData = value[0];
-    // Clear out metadata
-    d3.select("#sample-metadata").html("");
-
-    // Use Object.entries to add each key/value pair to the panel
-    Object.entries(valueData).forEach(([key, value]) => {
-      // Log the individual key/value pairs as they are being appended to the metadata panel
-      console.log(key, value);
-      d3.select("#sample-metadata").append("h5").text(`${key}: ${value}`);
-    });
-  });
-}
 
 // Function that builds the bar chart
-function buildBarChart(sample) {
+function BarChart(sample) {
   // Use D3 to retrieve all of the data
   d3.json(url).then((data) => {
     // Retrieve all sample data
     let sampleInfo = data.samples;
     // Filter based on the value of the sample
-    let value = sampleInfo.filter(result => result.id == sample);
-    // Get the first index from the array
-    let valueData = value[0];
+    let value = sampleInfo.filter(result => result.id == sample)[0];
     // Get the otu_ids, labels, and sample values
-    let otu_ids = valueData.otu_ids;
-    let otu_labels = valueData.otu_labels;
-    let sample_values = valueData.sample_values;
+    let { otu_ids, otu_labels, sample_values } = value;
     // Log the data to the console
     console.log(otu_ids, otu_labels, sample_values);
     // Set top ten items to display in descending order
@@ -86,6 +57,9 @@ function buildBarChart(sample) {
       y: yticks,
       text: labels,
       type: "bar",
+      marker: {
+        color: "brown"
+      },
       orientation: "h"
     };
 
@@ -99,20 +73,18 @@ function buildBarChart(sample) {
   });
 }
 
+
+
 // Function that builds the bubble chart
-function buildBubbleChart(sample) {
+function BubbleChart(sample) {
   // Use D3 to retrieve all of the data
   d3.json(url).then((data) => {
     // Retrieve all sample data
     let sampleInfo = data.samples;
     // Filter based on the value of the sample
-    let value = sampleInfo.filter(result => result.id == sample);
-    // Get the first index from the array
-    let valueData = value[0];
+    let valueData = sampleInfo.find(result => result.id == sample);
     // Get the otu_ids, labels, and sample values
-    let otu_ids = valueData.otu_ids;
-    let otu_labels = valueData.otu_labels;
-    let sample_values = valueData.sample_values;
+    let { otu_ids, otu_labels, sample_values } = valueData;
     // Log the data to the console
     console.log(otu_ids, otu_labels, sample_values);
     // Set up the trace for bubble chart
@@ -139,15 +111,41 @@ function buildBubbleChart(sample) {
   });
 }
 
+
 // Function that updates dashboard when sample is changed
 function optionChanged(value) {
   // Log the new value
   console.log(value);
   // Call all functions
-  buildMetadata(value);
-  buildBarChart(value);
-  buildBubbleChart(value);
-  buildGaugeChart(value);
+  Metadata(value);
+  BarChart(value);
+  BubbleChart(value);
+  GaugeChart(value);
+}
+
+
+// Function that populates metadata info
+function Metadata(sample) {
+  // Use D3 to retrieve all of the data
+  d3.json(url).then((data) => {
+    // Retrieve all metadata
+    let metadata = data.metadata;
+    // Filter based on the value of the sample
+    let value = metadata.filter(result => result.id == sample)[0];
+    // Select the metadata element
+    let demoSelect = d3.select("#sample-metadata");
+
+    // Update the HTML content with the metadata values
+    demoSelect.html(
+      `ID: ${value.id} <br> 
+      Ethnicity: ${value.ethnicity} <br>
+      Gender: ${value.gender} <br>
+      Age: ${value.age} <br>
+      Location: ${value.location} <br>
+      BBtype: ${value.bbtype} <br>
+      Wfreq: ${value.wfreq}`
+    );
+  });
 }
 
 // Call the initialize function
